@@ -21,6 +21,7 @@ i18next.init({
       translation: {
         hello: "Hello!",
         interpolationKey: "This is a <0>super cool</0> sentence!",
+        interpolationKeySelfClosing: "This has an image <0 /> here",
         interpolationKeyNoHTML:
           "This is a reference string without any HTML tags!",
       },
@@ -29,6 +30,7 @@ i18next.init({
       translation: {
         hello: "Bonjour !",
         interpolationKey: "Ceci est une phrase <0>super cool</0> !",
+        interpolationKeySelfClosing: "Ceci a une image <0 /> ici",
         interpolationKeyNoHTML:
           "Ceci est une chaîne de caractères de référence, sans aucune balise HTML !",
       },
@@ -75,12 +77,28 @@ describe("interpolate(...)", () => {
     );
   });
 
+  it.only("interpolates localized string with self-closing HTML tags", () => {
+    i18next.changeLanguage("fr");
+    const referenceString = 'This has an image <img src="./img.png" /> here';
+    const interpolatedStringFR = 'Ceci a une image <img src="./img.png" /> ici';
+
+    expect(interpolate("interpolationKeySelfClosing", referenceString)).toBe(
+      interpolatedStringFR
+    );
+
+    i18next.changeLanguage("en");
+    expect(interpolate("interpolationKeySelfClosing", referenceString)).toBe(
+      'This has an image <img src="./img.png" /> here'
+    );
+  });
+
   it("with an i18nKey that is undefined", () => {
     expect(interpolate("missingKey", referenceString)).toBe(referenceString);
     expect(console.warn).toHaveBeenCalled();
   });
 
   it("with no HTML tags in default slot", () => {
+    i18next.changeLanguage("en");
     expect(
       interpolate(
         "interpolationKeyNoHTML",
@@ -91,6 +109,7 @@ describe("interpolate(...)", () => {
   });
 
   it("with malformed HTML tags in default slot", () => {
+    i18next.changeLanguage("en");
     expect(
       interpolate(
         "interpolationKeyNoHTML",

@@ -60,7 +60,7 @@ export const interpolate = (
     return referenceString;
   }
 
-  const tagsRegex = /<([\w\d]+)([^>]*)>/gi;
+  const tagsRegex = /<([\w\d]+)([^>]*?)\s?\/?>/gi;
 
   const referenceStringMatches = referenceString.match(tagsRegex);
 
@@ -83,10 +83,17 @@ export const interpolate = (
   let interpolatedString = localizedString;
   for (let index = 0; index < referenceTags.length; index++) {
     const referencedTag = referenceTags[index];
+    // Replace self-closing tags
+    interpolatedString = interpolatedString.replaceAll(
+      new RegExp(`<${index} *\\/>`, "g"),
+      `<${referencedTag.name}${referencedTag.attributes} />`
+    );
+    // Replace opening tags
     interpolatedString = interpolatedString.replaceAll(
       `<${index}>`,
       `<${referencedTag.name}${referencedTag.attributes}>`
     );
+    // Replace closing tags
     interpolatedString = interpolatedString.replaceAll(
       `</${index}>`,
       `</${referencedTag.name}>`
