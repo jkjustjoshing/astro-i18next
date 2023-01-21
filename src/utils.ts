@@ -1,4 +1,4 @@
-import i18next, { t } from "i18next";
+import i18next, { t, exists } from "i18next";
 import { fileURLToPath } from "url";
 import load from "@proload/core";
 import { AstroI18nextConfig } from "./types";
@@ -54,12 +54,12 @@ export const interpolate = (
   referenceString: string,
   namespace: string | null = null
 ): string => {
-  const localizedString = t(i18nKey, { ns: namespace });
-
-  if (localizedString === i18nKey) {
+  if (!exists(i18nKey, { ns: namespace })) {
     console.warn(`WARNING(astro-i18next): missing translation key ${i18nKey}.`);
     return referenceString;
   }
+
+  const localizedString = t(i18nKey, { ns: namespace });
 
   const tagsRegex = /<([\w\d]+)([^>]*)>/gi;
 
